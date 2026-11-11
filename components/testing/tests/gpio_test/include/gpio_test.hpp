@@ -48,17 +48,5 @@ private:
 private:
     Config m_config{};
 
-    TestState m_state = TestState::IDLE;
-
-    TestResult m_result{};
-
-    TickType_t m_lastProcessTick = 0;
-
-    TickType_t m_intervalTicks = 0;
-
-    uint32_t m_completedCycles = 0;
-
     bool m_expectedLevel = false;
-
-    bool m_initialized = false;
 };

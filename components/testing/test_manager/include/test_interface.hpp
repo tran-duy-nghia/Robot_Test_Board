@@ -1,7 +1,9 @@
 #pragma once
 
-#include "test_state.hpp"
 #include "test_result.hpp"
+#include "test_state.hpp"
+#include "freertos/FreeRTOS.h"
+
 
 class ITest {
 public:
@@ -10,12 +12,12 @@ public:
     /**
      * @brief Unique test identifier.
      */
-    virtual const char* id() const = 0;
+    virtual const char *id() const = 0;
 
     /**
      * @brief Human-readable test name.
      */
-    virtual const char* name() const = 0;
+    virtual const char *name() const = 0;
 
     /**
      * @brief Initialize and start the test.
@@ -45,5 +47,18 @@ public:
     /**
      * @brief Get the latest test result.
      */
-    virtual const TestResult& result() const = 0;
+    virtual const TestResult &result() const = 0;
+
+protected:
+    TestState m_state = TestState::IDLE;
+
+    TestResult m_result{};
+
+    TickType_t m_lastProcessTick = 0;
+
+    TickType_t m_intervalTicks = 0;
+
+    uint32_t m_completedCycles = 0;
+
+    bool m_initialized = false;
 };
