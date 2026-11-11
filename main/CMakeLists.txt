@@ -6,4 +6,6 @@ idf_component_register(
 	REQUIRES
 	uart_link
 	protocol
+	test_manager
+	gpio_test
 )

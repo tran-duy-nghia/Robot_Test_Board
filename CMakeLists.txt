@@ -5,7 +5,11 @@ cmake_minimum_required(VERSION 3.22)
 set(EXTRA_COMPONENT_DIRS
     components/communication/uart_link
     components/communication/protocol
+
+    components/testing/test_manager
+    components/testing/tests/gpio_test
 )
 
 include($ENV{IDF_PATH}/tools/cmake/project.cmake)
+
 project(CTB_ESP32)
