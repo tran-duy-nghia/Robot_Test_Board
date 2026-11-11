@@ -2,5 +2,10 @@
 # CMakeLists in this exact order for cmake to work correctly
 cmake_minimum_required(VERSION 3.22)
 
+set(EXTRA_COMPONENT_DIRS
+    components/communication/uart_link
+    components/communication/protocol
+)
+
 include($ENV{IDF_PATH}/tools/cmake/project.cmake)
 project(CTB_ESP32)
