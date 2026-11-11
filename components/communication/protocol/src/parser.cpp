@@ -45,6 +45,9 @@ CommandType commandTypeFromToken(const char *token) {
     if (equalsIgnoreCase(token, "TEST_STATUS")) {
         return CommandType::TestStatus;
     }
+    if (equalsIgnoreCase(token, "LIST_TEST_ID")) {
+        return CommandType::ListTestID;
+    }   
 
     return CommandType::Unknown;
 }
@@ -59,6 +62,7 @@ ParseError validateArgumentCount(const Command &command) {
     case CommandType::Info:
     case CommandType::Status:
     case CommandType::Stop:
+    case CommandType::ListTestID:
     case CommandType::TestStatus:
         return command.argc == 0 ? ParseError::None : ParseError::InvalidArgument;
 

@@ -15,6 +15,7 @@ bool Dispatcher::resolveRoute(const CommandType type, Route& route) noexcept {
     case CommandType::Ping:
     case CommandType::Help:
     case CommandType::Info:
+    case CommandType::ListTestID:
     case CommandType::Status:
         route = {CommandDomain::System, 0U, 0U};
         return true;
