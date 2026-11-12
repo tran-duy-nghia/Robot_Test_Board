@@ -56,6 +56,7 @@ bool EncoderTest::start() {
     }
 
     if (!initializeCapture()) {
+        cleanUp();
         m_result.setFailure(TestError::HARDWARE_ERROR, "MCPWM capture initialization failed");
         m_state = TestState::FAILED;
         return false;
@@ -226,8 +227,7 @@ void EncoderTest::process() {
         char message[128];
 
         std::snprintf(message, sizeof(message), "Encoder timeout: CH1=%lu CH2=%lu CH3=%lu",
-                      static_cast<unsigned long>(snapShot[0].pulse_count), 
-                      static_cast<unsigned long>(snapShot[1].pulse_count),
+                      static_cast<unsigned long>(snapShot[0].pulse_count), static_cast<unsigned long>(snapShot[1].pulse_count),
                       static_cast<unsigned long>(snapShot[2].pulse_count));
 
         m_result.setFailure(TestError::VALIDATION_FAILED, message);
@@ -260,10 +260,60 @@ void EncoderTest::failStart(const char *message) {
 }
 
 void EncoderTest::cleanUp() {
+    // 1. Stop capture timer
     if (m_timerStarted && m_captureTimer != nullptr) {
-        mcpwm_capture_timer_stop(m_captureTimer);
-        m_timerStarted = false;
+        const esp_err_t err = mcpwm_capture_timer_stop(m_captureTimer);
+
+        if (err == ESP_OK) {
+            m_timerStarted = false;
+        }
     }
 
-    
+    // 2. Disable all capture channels
+    for (uint8_t i = 0; i < CHANNEL_COUNT; ++i) {
+        if (m_channelEnabled[i] && m_captureChannels[i] != nullptr) {
+            const esp_err_t err = mcpwm_capture_channel_disable(m_captureChannels[i]);
+
+            if (err == ESP_OK) {
+                m_channelEnabled[i] = false;
+            }
+        }
+    }
+
+    // 3. Delete capture channels FIRST
+    for (uint8_t i = 0; i < CHANNEL_COUNT; ++i) {
+        if (m_captureChannels[i] != nullptr) {
+            const esp_err_t err = mcpwm_del_capture_channel(m_captureChannels[i]);
+
+            if (err == ESP_OK) {
+                m_captureChannels[i] = nullptr;
+            } else {
+                printf("[ENCODER] Delete channel %u failed: %s\n", i, esp_err_to_name(err));
+            }
+        }
+    }
+
+    // 4. Disable capture timer
+    if (m_timerEnabled && m_captureTimer != nullptr) {
+        const esp_err_t err = mcpwm_capture_timer_disable(m_captureTimer);
+
+        if (err == ESP_OK) {
+            m_timerEnabled = false;
+        } else {
+            printf("[ENCODER] Disable timer failed: %s\n", esp_err_to_name(err));
+        }
+    }
+
+    // 5. Delete capture timer LAST
+    if (m_captureTimer != nullptr) {
+        const esp_err_t err = mcpwm_del_capture_timer(m_captureTimer);
+
+        if (err == ESP_OK) {
+            m_captureTimer = nullptr;
+        } else {
+            printf("[ENCODER] Delete timer failed: %s\n", esp_err_to_name(err));
+        }
+    }
+
+    m_captureResolutionHz = 0;
 }
