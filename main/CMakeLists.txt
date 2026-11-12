@@ -15,4 +15,5 @@ idf_component_register(
 	# gpio_test
 	i2c_test
 	encoder_test
+	uart_test
 )

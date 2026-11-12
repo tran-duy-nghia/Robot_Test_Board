@@ -10,6 +10,7 @@ set(EXTRA_COMPONENT_DIRS
     components/testing/tests/gpio_test
     components/testing/tests/i2c_test
     components/testing/tests/encoder_test
+    components/testing/tests/uart_test
 )
 
 include($ENV{IDF_PATH}/tools/cmake/project.cmake)
