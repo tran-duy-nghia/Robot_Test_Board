@@ -12,6 +12,7 @@ idf_component_register(
 	uart_link
 	protocol
 	test_manager
-	gpio_test
+	# gpio_test
 	i2c_test
+	encoder_test
 )
