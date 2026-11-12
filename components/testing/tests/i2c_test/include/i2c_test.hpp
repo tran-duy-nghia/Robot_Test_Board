@@ -2,8 +2,8 @@
 
 #include "test_interface.hpp"
 
-#include "driver/i2c_master.h"
 #include "driver/gpio.h"
+#include "driver/i2c_master.h"
 #include "freertos/FreeRTOS.h"
 
 #include <cstdint>
@@ -27,13 +27,13 @@ public:
 
     I2CTest() = default;
 
-    explicit I2CTest(const Config& config);
+    explicit I2CTest(const Config &config);
 
     ~I2CTest() override;
 
-    const char* id() const override;
+    const char *id() const override;
 
-    const char* name() const override;
+    const char *name() const override;
 
     bool start() override;
 
@@ -43,7 +43,7 @@ public:
 
     TestState state() const override;
 
-    const TestResult& result() const override;
+    const TestResult &result() const override;
 
 private:
     bool configureI2C();
@@ -58,4 +58,9 @@ private:
     uint8_t m_nextAddress = 0x08;
 
     uint8_t m_foundDevices = 0;
+
+    TickType_t m_lastProcessTick = 0;
+    TickType_t m_intervalTicks = 0;
+
+    uint32_t m_completedCycles = 0;
 };

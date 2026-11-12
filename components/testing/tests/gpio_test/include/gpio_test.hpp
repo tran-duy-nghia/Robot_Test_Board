@@ -18,7 +18,7 @@ public:
         gpio_num_t pin = GPIO_NUM_4;
 
         Mode mode = Mode::INPUT;
-        
+
         // Input configuration
         bool pull_up = false;
         bool pull_down = false;
@@ -35,13 +35,13 @@ public:
 
     GpioTest() = default;
 
-    explicit GpioTest(const Config& config);
+    explicit GpioTest(const Config &config);
 
     ~GpioTest() override;
 
-    const char* id() const override;
+    const char *id() const override;
 
-    const char* name() const override;
+    const char *name() const override;
 
     bool start() override;
 
@@ -51,7 +51,7 @@ public:
 
     TestState state() const override;
 
-    const TestResult& result() const override;
+    const TestResult &result() const override;
 
 private:
     bool configureInput();
@@ -70,7 +70,7 @@ private:
 
     void cleanUp();
 
-    static void IRAM_ATTR interruptHandler(void* arg);
+    static void IRAM_ATTR interruptHandler(void *arg);
 
 private:
     Config m_config{};
@@ -83,4 +83,8 @@ private:
 
     TickType_t m_startTick = 0;
     TickType_t m_timeoutTicks = 0;
+    TickType_t m_lastProcessTick = 0;
+    TickType_t m_intervalTicks = 0;
+
+    uint32_t m_completedCycles = 0;
 };
