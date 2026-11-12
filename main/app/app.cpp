@@ -11,10 +11,10 @@
 #include <string>
 
 namespace {
-constexpr char TAG[] = "APP";
-constexpr uint32_t APP_TASK_STACK_SIZE = 4096;
-constexpr UBaseType_t APP_TASK_PRIORITY = 5;
-constexpr TickType_t APP_LOOP_DELAY = pdMS_TO_TICKS(1);
+    constexpr char TAG[] = "APP";
+    constexpr uint32_t APP_TASK_STACK_SIZE = 4096;
+    constexpr UBaseType_t APP_TASK_PRIORITY = 5;
+    constexpr TickType_t APP_LOOP_DELAY = pdMS_TO_TICKS(1);
 } // namespace
 
 void App::main() {
@@ -41,6 +41,7 @@ esp_err_t App::initialize() {
 
     ESP_RETURN_ON_ERROR(this->registerI2CTest(), TAG, "Failed to register I2C test");
     ESP_RETURN_ON_ERROR(this->registerEncoderTest(), TAG, "Failed to register Encoder test");
+    ESP_RETURN_ON_ERROR(this->registerUartTest(), TAG, "Failed to register UART test");
 
     m_dispatcher.setSystemHandler(&App::systemCommandHandler, this);
     m_dispatcher.setTestHandler(&App::testCommandHandler, this);
@@ -93,9 +94,9 @@ void App::taskSignalGen(void *argument) {
     GPIO.out_w1tc = ENCODER_TEST_PIN_MASK;
 
     while (true) {
-        GPIO.out_w1ts = ENCODER_TEST_PIN_MASK; 
+        GPIO.out_w1ts = ENCODER_TEST_PIN_MASK;
         vTaskDelay(pdMS_TO_TICKS(50));
-        GPIO.out_w1tc = ENCODER_TEST_PIN_MASK; 
+        GPIO.out_w1tc = ENCODER_TEST_PIN_MASK;
         vTaskDelay(pdMS_TO_TICKS(50));
     }
 }
@@ -349,5 +350,24 @@ esp_err_t App::registerEncoderTest() {
         return ESP_FAIL;
     }
 
+    return ESP_OK;
+}
+
+esp_err_t App::registerUartTest() {
+    UartTest::Config config{};
+    config.port = UART_TEST_PORT;
+    config.tx_pin = UART_TEST_TX_PIN;
+    config.rx_pin = UART_TEST_RX_PIN;
+    config.baudrate = UART_TEST_BAUDRATE;
+    config.timeout_ms = UART_TEST_TIMEOUT_MS;
+    config.expected_bytes = UART_TEST_EXPECTED_BYTES;
+    
+    m_uartTest = UartTest(config);
+
+    if (!m_registry.registerTest(&m_uartTest)) {
+        ESP_LOGE(TAG, "Failed to register UART test");
+        return ESP_FAIL;
+    }
+    
     return ESP_OK;
 }

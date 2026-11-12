@@ -6,6 +6,7 @@
 #include "dispatcher.hpp"
 #include "encoder_test.hpp"
 #include "i2c_test.hpp"
+#include "uart_test.hpp"
 #include "parser.hpp"
 #include "test_manager.hpp"
 #include "test_registry.hpp"
@@ -47,12 +48,14 @@ private:
 
     esp_err_t registerI2CTest();
     esp_err_t registerEncoderTest();
+    esp_err_t registerUartTest();
 
 private:
     UartLink m_uart{};
 
     I2CTest m_i2cTest{};
     EncoderTest m_encoderTest{};
+    UartTest m_uartTest{};
 
     TestRegistry m_registry{};
     TestManager m_testManager{m_registry};

@@ -1,6 +1,6 @@
 #pragma once
 
-#define ENCODER_TEST_SIGNAL 1
+#define ENCODER_TEST_SIGNAL 0
 #if ENCODER_TEST_SIGNAL
 #define ENCODER_TEST_PIN_MASK ((1ULL << GPIO_NUM_2) | (1ULL << GPIO_NUM_4) | (1ULL << GPIO_NUM_18))
 #endif
@@ -17,3 +17,16 @@
 #define ENCODER_TEST_CH1_PIN GPIO_NUM_42
 #define ENCODER_TEST_CH2_PIN GPIO_NUM_45
 #define ENCODER_TEST_CH3_PIN GPIO_NUM_41
+
+// PWM test configuration
+
+// UART test configuration
+// UART loopback test configuration
+#define UART_TEST_PORT UART_NUM_1
+
+#define UART_TEST_TX_PIN GPIO_NUM_4
+#define UART_TEST_RX_PIN GPIO_NUM_5
+
+#define UART_TEST_BAUDRATE 115200
+#define UART_TEST_TIMEOUT_MS 10000
+#define UART_TEST_EXPECTED_BYTES 10
