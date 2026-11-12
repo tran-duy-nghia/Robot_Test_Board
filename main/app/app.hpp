@@ -2,8 +2,9 @@
 
 #include "esp_err.h"
 
+#include "app_config.hpp"
 #include "dispatcher.hpp"
-#include "gpio_test.hpp"
+#include "encoder_test.hpp"
 #include "i2c_test.hpp"
 #include "parser.hpp"
 #include "test_manager.hpp"
@@ -29,6 +30,11 @@ private:
     esp_err_t initialize();
 
     static void taskEntry(void *argument);
+
+#if ENCODER_TEST_SIGNAL
+    static void taskSignalGen(void *argument);
+#endif
+
     void run();
 
     static void systemCommandHandler(const Command &command, void *context);
@@ -39,14 +45,14 @@ private:
     static const char *parseErrorToString(ParseError error);
     static const char *managerErrorToString(TestManagerError error);
 
-    esp_err_t registerGpioTest();
     esp_err_t registerI2CTest();
+    esp_err_t registerEncoderTest();
 
 private:
     UartLink m_uart{};
-    
-    GpioTest m_gpioTest{};
+
     I2CTest m_i2cTest{};
+    EncoderTest m_encoderTest{};
 
     TestRegistry m_registry{};
     TestManager m_testManager{m_registry};
