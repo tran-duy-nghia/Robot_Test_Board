@@ -1,20 +1,17 @@
 #include "app.hpp"
-
+#include "app_config.hpp"
 #include "esp_check.h"
 #include "esp_log.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
-#if ENCODER_TEST_SIGNAL
-#include "soc/gpio_struct.h"
-#endif
 #include <cstdio>
 #include <string>
 
 namespace {
-    constexpr char TAG[] = "APP";
-    constexpr uint32_t APP_TASK_STACK_SIZE = 4096;
-    constexpr UBaseType_t APP_TASK_PRIORITY = 5;
-    constexpr TickType_t APP_LOOP_DELAY = pdMS_TO_TICKS(1);
+constexpr char TAG[] = "APP";
+constexpr uint32_t APP_TASK_STACK_SIZE = 4096;
+constexpr UBaseType_t APP_TASK_PRIORITY = 5;
+constexpr TickType_t APP_LOOP_DELAY = pdMS_TO_TICKS(1);
 } // namespace
 
 void App::main() {
@@ -42,6 +39,7 @@ esp_err_t App::initialize() {
     ESP_RETURN_ON_ERROR(this->registerI2CTest(), TAG, "Failed to register I2C test");
     ESP_RETURN_ON_ERROR(this->registerEncoderTest(), TAG, "Failed to register Encoder test");
     ESP_RETURN_ON_ERROR(this->registerUartTest(), TAG, "Failed to register UART test");
+    ESP_RETURN_ON_ERROR(this->registerPwmTest(), TAG, "Failed to register PWM test");
 
     m_dispatcher.setSystemHandler(&App::systemCommandHandler, this);
     m_dispatcher.setTestHandler(&App::testCommandHandler, this);
@@ -57,15 +55,6 @@ esp_err_t App::initialize() {
         return ESP_ERR_NO_MEM;
     }
 
-#if ENCODER_TEST_SIGNAL
-    const BaseType_t sigGenTaskCreated =
-        xTaskCreate(&App::taskSignalGen, "sig_gen_task", APP_TASK_STACK_SIZE, this, APP_TASK_PRIORITY, nullptr);
-    if (sigGenTaskCreated != pdPASS) {
-        ESP_LOGE(TAG, "Failed to create signal generation task");
-        return ESP_ERR_NO_MEM;
-    }
-#endif
-
     ESP_LOGI(TAG, "Application initialized; registered tests: %u", static_cast<unsigned>(m_registry.size()));
 
     return ESP_OK;
@@ -79,28 +68,6 @@ void App::taskEntry(void *argument) {
 
     vTaskDelete(nullptr);
 }
-
-#if ENCODER_TEST_SIGNAL
-void App::taskSignalGen(void *argument) {
-    gpio_config_t io_conf = {
-        .pin_bit_mask = ENCODER_TEST_PIN_MASK,
-        .mode = GPIO_MODE_OUTPUT,
-        .pull_up_en = GPIO_PULLUP_DISABLE,
-        .pull_down_en = GPIO_PULLDOWN_DISABLE,
-        .intr_type = GPIO_INTR_DISABLE,
-    };
-
-    gpio_config(&io_conf);
-    GPIO.out_w1tc = ENCODER_TEST_PIN_MASK;
-
-    while (true) {
-        GPIO.out_w1ts = ENCODER_TEST_PIN_MASK;
-        vTaskDelay(pdMS_TO_TICKS(50));
-        GPIO.out_w1tc = ENCODER_TEST_PIN_MASK;
-        vTaskDelay(pdMS_TO_TICKS(50));
-    }
-}
-#endif
 
 void App::run() {
     while (true) {
@@ -361,13 +328,31 @@ esp_err_t App::registerUartTest() {
     config.baudrate = UART_TEST_BAUDRATE;
     config.timeout_ms = UART_TEST_TIMEOUT_MS;
     config.expected_bytes = UART_TEST_EXPECTED_BYTES;
-    
+
     m_uartTest = UartTest(config);
 
     if (!m_registry.registerTest(&m_uartTest)) {
         ESP_LOGE(TAG, "Failed to register UART test");
         return ESP_FAIL;
     }
-    
+
+    return ESP_OK;
+}
+
+esp_err_t App::registerPwmTest() {
+    PwmTest::Config config{};
+    config.pins = {PWM_TEST_CH1_PIN, PWM_TEST_CH2_PIN, PWM_TEST_CH3_PIN, PWM_TEST_CH4_PIN};
+    config.frequency_hz = PWM_TEST_FREQUENCY_HZ;
+    config.resolution_bits = PWM_TEST_RESOLUTION_BITS;
+    config.duty_percent = PWM_TEST_DUTY_PERCENT;
+    config.channel_duration_ms = PWM_TEST_CHANNEL_DURATION_MS;
+
+    m_pwmTest = PwmTest(config);
+
+    if (!m_registry.registerTest(&m_pwmTest)) {
+        ESP_LOGE(TAG, "Failed to register PWM test");
+        return ESP_FAIL;
+    }
+
     return ESP_OK;
 }

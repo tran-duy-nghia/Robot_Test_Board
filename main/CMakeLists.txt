@@ -16,4 +16,5 @@ idf_component_register(
 	i2c_test
 	encoder_test
 	uart_test
+	pwm_test
 )

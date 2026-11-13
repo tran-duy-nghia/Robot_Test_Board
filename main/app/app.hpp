@@ -2,11 +2,11 @@
 
 #include "esp_err.h"
 
-#include "app_config.hpp"
 #include "dispatcher.hpp"
 #include "encoder_test.hpp"
 #include "i2c_test.hpp"
 #include "uart_test.hpp"
+#include "pwm_test.hpp"
 #include "parser.hpp"
 #include "test_manager.hpp"
 #include "test_registry.hpp"
@@ -32,10 +32,6 @@ private:
 
     static void taskEntry(void *argument);
 
-#if ENCODER_TEST_SIGNAL
-    static void taskSignalGen(void *argument);
-#endif
-
     void run();
 
     static void systemCommandHandler(const Command &command, void *context);
@@ -49,6 +45,7 @@ private:
     esp_err_t registerI2CTest();
     esp_err_t registerEncoderTest();
     esp_err_t registerUartTest();
+    esp_err_t registerPwmTest();
 
 private:
     UartLink m_uart{};
@@ -56,6 +53,7 @@ private:
     I2CTest m_i2cTest{};
     EncoderTest m_encoderTest{};
     UartTest m_uartTest{};
+    PwmTest m_pwmTest{};
 
     TestRegistry m_registry{};
     TestManager m_testManager{m_registry};
