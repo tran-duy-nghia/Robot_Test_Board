@@ -17,4 +17,6 @@ idf_component_register(
 	encoder_test
 	uart_test
 	pwm_test
+	m288t_test
+	dynamixel
 )

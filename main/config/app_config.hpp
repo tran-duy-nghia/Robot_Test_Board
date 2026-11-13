@@ -31,3 +31,14 @@
 #define UART_TEST_BAUDRATE 115200
 #define UART_TEST_TIMEOUT_MS 10000
 #define UART_TEST_EXPECTED_BYTES 10
+
+
+// DYNAMIXEL XL330-M288-T communication/identification test
+#define M288T_TEST_TX_PIN GPIO_NUM_5
+#define M288T_TEST_RX_PIN GPIO_NUM_4
+#define M288T_TEST_BAUDRATE SOFT_UART_57600
+#define M288T_TEST_DEVICE_ID 1
+#define M288T_TEST_RESPONSE_TIMEOUT_MS 150
+// Verify these levels against the board buffer schematic before powering the motor.
+#define M288T_TEST_TX_DIRECTION_LEVEL 0
+#define M288T_TEST_RX_DIRECTION_LEVEL 1

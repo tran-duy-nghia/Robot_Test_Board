@@ -40,6 +40,7 @@ esp_err_t App::initialize() {
     ESP_RETURN_ON_ERROR(this->registerEncoderTest(), TAG, "Failed to register Encoder test");
     ESP_RETURN_ON_ERROR(this->registerUartTest(), TAG, "Failed to register UART test");
     ESP_RETURN_ON_ERROR(this->registerPwmTest(), TAG, "Failed to register PWM test");
+    ESP_RETURN_ON_ERROR(this->registerM288TTest(), TAG, "Failed to register M288T test");
 
     m_dispatcher.setSystemHandler(&App::systemCommandHandler, this);
     m_dispatcher.setTestHandler(&App::testCommandHandler, this);
@@ -351,6 +352,30 @@ esp_err_t App::registerPwmTest() {
 
     if (!m_registry.registerTest(&m_pwmTest)) {
         ESP_LOGE(TAG, "Failed to register PWM test");
+        return ESP_FAIL;
+    }
+
+    return ESP_OK;
+}
+
+
+esp_err_t App::registerM288TTest() {
+    M288TTest::Config config{};
+
+    config.motor.id = M288T_TEST_DEVICE_ID;
+    config.motor.expected_model_number = M288T::MODEL_NUMBER_XL330_M288_T;
+
+    config.motor.transport.tx_pin = M288T_TEST_TX_PIN;
+    config.motor.transport.rx_pin = M288T_TEST_RX_PIN;
+    config.motor.transport.baudrate = M288T_TEST_BAUDRATE;
+    config.motor.transport.response_timeout_ms = M288T_TEST_RESPONSE_TIMEOUT_MS;
+    config.motor.transport.tx_direction_level = M288T_TEST_TX_DIRECTION_LEVEL;
+    config.motor.transport.rx_direction_level = M288T_TEST_RX_DIRECTION_LEVEL;
+
+    m_m288tTest.configure(config);
+
+    if (!m_registry.registerTest(&m_m288tTest)) {
+        ESP_LOGE(TAG, "Failed to register M288T test");
         return ESP_FAIL;
     }
 

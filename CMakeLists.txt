@@ -6,12 +6,16 @@ set(EXTRA_COMPONENT_DIRS
     components/communication/uart_link
     components/communication/protocol
 
+    components/driver/soft_uart
+
     components/testing/test_manager
     components/testing/tests/gpio_test
     components/testing/tests/i2c_test
     components/testing/tests/encoder_test
     components/testing/tests/uart_test
     components/testing/tests/pwm_test
+    components/hardware/dynamixel
+    components/testing/tests/m288t_test
 )
 
 include($ENV{IDF_PATH}/tools/cmake/project.cmake)

@@ -7,6 +7,7 @@
 #include "i2c_test.hpp"
 #include "uart_test.hpp"
 #include "pwm_test.hpp"
+#include "m288t_test.hpp"
 #include "parser.hpp"
 #include "test_manager.hpp"
 #include "test_registry.hpp"
@@ -46,6 +47,7 @@ private:
     esp_err_t registerEncoderTest();
     esp_err_t registerUartTest();
     esp_err_t registerPwmTest();
+    esp_err_t registerM288TTest();
 
 private:
     UartLink m_uart{};
@@ -54,6 +56,7 @@ private:
     EncoderTest m_encoderTest{};
     UartTest m_uartTest{};
     PwmTest m_pwmTest{};
+    M288TTest m_m288tTest{};
 
     TestRegistry m_registry{};
     TestManager m_testManager{m_registry};
